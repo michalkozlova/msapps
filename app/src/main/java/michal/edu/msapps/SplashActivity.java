@@ -46,7 +46,6 @@ public class SplashActivity extends AppCompatActivity {
         System.out.println(dbHelper);
 
         SQLiteDatabase db =  dbHelper.getWritableDatabase();
-//        db.execSQL("INSERT INTO Movies(title, image, rating, releaseYear, genre) VALUES ('tit', 'img', 1.0, 2004, 'romantic')");
 
 
         Cursor cursor = db.rawQuery("SELECT * FROM Movies WHERE id = ?", new String[]{"1"});
@@ -54,17 +53,14 @@ public class SplashActivity extends AppCompatActivity {
         if (!cursor.moveToFirst()) {
             Toast.makeText(this, "NO movies", Toast.LENGTH_LONG).show();
             new FetchDataTask().execute(url);
+
+            Intent intent = new Intent(this, MovieActivity.class);
+            startActivity(intent);
         } else {
             Intent intent = new Intent(this, MovieActivity.class);
             startActivity(intent);
         }
 
-
-
-        //read database
-//        do {
-//            cursor.getString(2);
-//        } while (cursor.moveToNext());
 
     }
 
