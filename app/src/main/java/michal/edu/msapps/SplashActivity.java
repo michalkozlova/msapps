@@ -2,6 +2,7 @@ package michal.edu.msapps;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -28,6 +29,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -45,14 +49,15 @@ public class SplashActivity extends AppCompatActivity {
 //        db.execSQL("INSERT INTO Movies(title, image, rating, releaseYear, genre) VALUES ('tit', 'img', 1.0, 2004, 'romantic')");
 
 
-//        Cursor cursor = db.rawQuery("SELECT * FROM Movies WHERE id = ?", new String[]{"1"});
-//
-//        if (!cursor.moveToFirst()) {
-//            Toast.makeText(this, "NO movies", Toast.LENGTH_LONG).show();
-//        } else {
-//            Intent intent = new Intent(this, MovieActivity.class);
-//            startActivity(intent);
-//        }
+        Cursor cursor = db.rawQuery("SELECT * FROM Movies WHERE id = ?", new String[]{"1"});
+
+        if (!cursor.moveToFirst()) {
+            Toast.makeText(this, "NO movies", Toast.LENGTH_LONG).show();
+            new FetchDataTask().execute(url);
+        } else {
+            Intent intent = new Intent(this, MovieActivity.class);
+            startActivity(intent);
+        }
 
 
 
@@ -60,9 +65,6 @@ public class SplashActivity extends AppCompatActivity {
 //        do {
 //            cursor.getString(2);
 //        } while (cursor.moveToNext());
-
-
-        new FetchDataTask().execute(url);
 
     }
 
@@ -85,7 +87,6 @@ public class SplashActivity extends AppCompatActivity {
 
                 if (inputStream != null){
                     result = convertInputStreamToString(inputStream);
-                    System.out.println("Data received: " + result);
                 }
                 else
                     result = "Failed";
@@ -100,10 +101,11 @@ public class SplashActivity extends AppCompatActivity {
             return null;
         }
 
-//        @Override
-//        protected void onPostExecute(String s) {
-//            super.onPostExecute(s);
-//        }
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            parseJSONandSaveInDB(s);
+        }
 
         private String convertInputStreamToString(InputStream inputStream) throws IOException{
             BufferedReader bufferedReader = new BufferedReader( new InputStreamReader(inputStream));
@@ -115,5 +117,56 @@ public class SplashActivity extends AppCompatActivity {
             inputStream.close();
             return result;
         }
+
+
+        private void parseJSONandSaveInDB(String data){
+
+            try {
+                JSONArray jsonArray = new JSONArray(data);
+                int jsonArrLength = jsonArray.length();
+
+                for (int i = 0; i < jsonArrLength; i++) {
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+                    String title = jsonObject.getString("title");
+                    String image = jsonObject.getString("image");
+                    double rating = jsonObject.getDouble("rating");
+                    int releaseYear = jsonObject.getInt("releaseYear");
+
+                    JSONArray gen = jsonObject.getJSONArray("genre");
+                    String genre = gen.join(",");
+
+                    List<String> myList = new ArrayList<>(Arrays.asList(genre.split(",")));
+                    List<String> myNewList = new ArrayList<>();
+                    for (String s : myList) {
+                        String newS = s.substring(1, s.length()-1);
+                        myNewList.add(newS);
+                    }
+
+                    String stringForDB = "";
+                    for (String s1 : myNewList) {
+                        stringForDB += s1 + "\t";
+                    }
+
+
+                    MovieOpenHelper dbHelper = new MovieOpenHelper(SplashActivity.this);
+                    SQLiteDatabase db =  dbHelper.getWritableDatabase();
+
+                    ContentValues values = new ContentValues();
+                    values.put("title", title);
+                    values.put("image", image);
+                    values.put("rating", rating);
+                    values.put("releaseYear", releaseYear);
+                    values.put("genre", stringForDB);
+
+                    db.insert("Movies", null, values);
+                }
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+        }
+
     }
 }
