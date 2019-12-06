@@ -3,9 +3,14 @@ package michal.edu.msapps;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Build;
+
+import androidx.annotation.RequiresApi;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class Movie_DAO {
 
@@ -27,6 +32,7 @@ public class Movie_DAO {
         return instance;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     public ArrayList<Movie> getMovies(){
         ArrayList<Movie> movies = new ArrayList<>();
 
@@ -47,6 +53,16 @@ public class Movie_DAO {
             movies.add(new Movie(id, title, image, rating, releaseYear, myGenre));
 
         }while (cursor.moveToNext());
+
+//        //sort stores with ABC
+//        Collections.sort(allStores, new Comparator<Store>() {
+//            @Override
+//            public int compare(Store o1, Store o2) {
+//                return o1.getStoreName().compareTo(o2.getStoreName());
+//            }
+//        });
+
+       movies.sort(Comparator.comparing(Movie::getReleaseYear));
 
         cursor.close();
         return movies;

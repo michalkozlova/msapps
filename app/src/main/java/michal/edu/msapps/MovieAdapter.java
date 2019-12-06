@@ -32,8 +32,8 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
     public void onBindViewHolder(@NonNull MovieViewHolder holder, int position) {
         Movie movie = movies.get(position);
 
-        String m = String.valueOf(movie.getReleaseYear());
-        holder.btnMovieYear.setText(m);
+        String year = String.valueOf(movie.getReleaseYear());
+        holder.btnMovieYear.setText(year);
         holder.btnMovieName.setText(movie.getTitle());
     }
 
