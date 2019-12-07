@@ -32,6 +32,7 @@ public class Movie_DAO {
         return instance;
     }
 
+    //TODO: requiresApi
     @RequiresApi(api = Build.VERSION_CODES.N)
     public ArrayList<Movie> getMovies(){
         ArrayList<Movie> movies = new ArrayList<>();
@@ -54,7 +55,7 @@ public class Movie_DAO {
 
         }while (cursor.moveToNext());
 
-
+        //TODO: requiresApi
        movies.sort(Comparator.comparing(Movie::getReleaseYear));
 
         cursor.close();
