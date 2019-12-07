@@ -56,23 +56,12 @@ public class MovieDetailsFragment extends Fragment {
         Movie movie = (Movie) getArguments().getSerializable("movie");
 
 
-//        try {
-//            assert movie != null;
-//            Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL(movie.getImage()).getContent());
-//            ivImage.setImageBitmap(bitmap);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-
-
         assert movie != null;
+        Picasso.get().load(movie.getImage()).into(ivImage);
         tvTitle.setText(movie.getTitle());
         tvYear.setText(String.valueOf(movie.getReleaseYear()));
         tvRating.setText(String.valueOf(movie.getRating()));
         tvGenre.setText(movie.getGenre());
-
-        Picasso.get().load(movie.getImage()).into(ivImage);
-        System.out.println("url " + movie.getImage());
 
         return v;
     }

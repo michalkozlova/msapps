@@ -139,9 +139,17 @@ public class SplashActivity extends AppCompatActivity {
                         myNewList.add(newS);
                     }
 
-                    String stringForDB = "";
-                    for (String s1 : myNewList) {
-                        stringForDB += s1 + "\t";
+                    StringBuilder stringForDB = new StringBuilder();
+//                    for (String s1 : myNewList) {
+//                        stringForDB += s1 + "\t";
+//                    }
+
+                    for (int j = 0; j < myNewList.size(); j++) {
+                        if (j == (myNewList.size()-1)){
+                            stringForDB.append(myNewList.get(j));
+                        }else {
+                            stringForDB.append(myNewList.get(j)).append(", ");
+                        }
                     }
 
 
@@ -153,7 +161,7 @@ public class SplashActivity extends AppCompatActivity {
                     values.put("image", image);
                     values.put("rating", rating);
                     values.put("releaseYear", releaseYear);
-                    values.put("genre", stringForDB);
+                    values.put("genre", stringForDB.toString());
 
                     db.insert("Movies", null, values);
                 }
