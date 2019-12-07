@@ -35,6 +35,17 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
         String year = String.valueOf(movie.getReleaseYear());
         holder.btnMovieYear.setText(year);
         holder.btnMovieName.setText(movie.getTitle());
+
+        holder.btnMovieName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                fragmentActivity.getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.container, MovieDetailsFragment.newInstance(movie))
+                        .addToBackStack(null)
+                        .commit();
+            }
+        });
     }
 
     @Override

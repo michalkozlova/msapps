@@ -1,17 +1,18 @@
 package michal.edu.msapps;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Movie {
+public class Movie implements Serializable {
 
     private int id = -1;
     private String title;
     private String image;
     private double rating;
     private int releaseYear;
-    private ArrayList<String> genre;
+    private String genre;
 
-    public Movie(int id, String title, String image, double rating, int releaseYear, ArrayList<String> genre) {
+    public Movie(int id, String title, String image, double rating, int releaseYear, String genre) {
         this.id = id;
         this.title = title;
         this.image = image;
@@ -52,11 +53,11 @@ public class Movie {
         this.releaseYear = releaseYear;
     }
 
-    public ArrayList<String> getGenre() {
+    public String getGenre() {
         return genre;
     }
 
-    public void setGenre(ArrayList<String> genre) {
+    public void setGenre(String genre) {
         this.genre = genre;
     }
 

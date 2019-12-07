@@ -53,9 +53,6 @@ public class SplashActivity extends AppCompatActivity {
         if (!cursor.moveToFirst()) {
             Toast.makeText(this, "NO movies", Toast.LENGTH_LONG).show();
             new FetchDataTask().execute(url);
-
-            Intent intent = new Intent(this, MovieActivity.class);
-            startActivity(intent);
         } else {
             Intent intent = new Intent(this, MovieActivity.class);
             startActivity(intent);
@@ -101,6 +98,9 @@ public class SplashActivity extends AppCompatActivity {
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
             parseJSONandSaveInDB(s);
+
+            Intent intent = new Intent(SplashActivity.this, MovieActivity.class);
+            startActivity(intent);
         }
 
         private String convertInputStreamToString(InputStream inputStream) throws IOException{

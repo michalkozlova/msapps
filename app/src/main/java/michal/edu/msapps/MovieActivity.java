@@ -17,7 +17,7 @@ public class MovieActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie);
 
-        System.out.println(Movie_DAO.getInstance(this).getMovies());
+//        System.out.println(Movie_DAO.getInstance(this).getMovies());
 
         FragmentManager fm = getSupportFragmentManager();
         fm.beginTransaction()

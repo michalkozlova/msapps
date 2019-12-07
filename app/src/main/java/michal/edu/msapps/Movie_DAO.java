@@ -48,27 +48,16 @@ public class Movie_DAO {
 
             String gs = cursor.getString(5);
 
-            ArrayList<String> myGenre = new ArrayList<String>(Arrays.asList(gs.split(" ")));
+//            ArrayList<String> myGenre = new ArrayList<String>(Arrays.asList(gs.split(" ")));
 
-            movies.add(new Movie(id, title, image, rating, releaseYear, myGenre));
+            movies.add(new Movie(id, title, image, rating, releaseYear, gs));
 
         }while (cursor.moveToNext());
 
-//        //sort stores with ABC
-//        Collections.sort(allStores, new Comparator<Store>() {
-//            @Override
-//            public int compare(Store o1, Store o2) {
-//                return o1.getStoreName().compareTo(o2.getStoreName());
-//            }
-//        });
 
        movies.sort(Comparator.comparing(Movie::getReleaseYear));
 
         cursor.close();
         return movies;
-    }
-
-    public void delete(int id){
-        db.delete("Movies","id = ?", new String[]{"" + id});
     }
 }
