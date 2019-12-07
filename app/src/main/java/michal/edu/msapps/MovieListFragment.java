@@ -13,6 +13,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -23,6 +25,7 @@ import java.util.Arrays;
 public class MovieListFragment extends Fragment {
 
     private RecyclerView rvMovies;
+    private FloatingActionButton fab;
 
     public MovieListFragment() {
         // Required empty public constructor
@@ -36,6 +39,7 @@ public class MovieListFragment extends Fragment {
         // Inflate the layout for this fragment
         View v =  inflater.inflate(R.layout.fragment_movie_list, container, false);
         rvMovies = v.findViewById(R.id.rvMovies);
+        fab = v.findViewById(R.id.fab);
 
         ArrayList<Movie> movies = Movie_DAO.getInstance(getContext()).getMovies();
 
