@@ -43,7 +43,7 @@ public class Movie_DAO {
             int id = cursor.getInt(0);
             String title = cursor.getString(1);
             String image = cursor.getString(2);
-            Double rating = cursor.getDouble(3);
+            double rating = cursor.getDouble(3);
             int releaseYear = cursor.getInt(4);
 
             String gs = cursor.getString(5);

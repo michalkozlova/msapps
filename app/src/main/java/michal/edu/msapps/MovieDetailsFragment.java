@@ -15,6 +15,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -68,6 +70,9 @@ public class MovieDetailsFragment extends Fragment {
         tvYear.setText(String.valueOf(movie.getReleaseYear()));
         tvRating.setText(String.valueOf(movie.getRating()));
         tvGenre.setText(movie.getGenre());
+
+        Picasso.get().load(movie.getImage()).into(ivImage);
+        System.out.println("url " + movie.getImage());
 
         return v;
     }
