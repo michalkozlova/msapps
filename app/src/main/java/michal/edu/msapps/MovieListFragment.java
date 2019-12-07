@@ -47,6 +47,18 @@ public class MovieListFragment extends Fragment {
         rvMovies.setLayoutManager(new LinearLayoutManager(getContext()));
         rvMovies.setAdapter(adapter);
 
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getActivity()
+                        .getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.container, new QRSCannerFragment())
+                        .addToBackStack(null)
+                        .commit();
+            }
+        });
+
         return v;
     }
 

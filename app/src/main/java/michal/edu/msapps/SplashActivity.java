@@ -140,9 +140,6 @@ public class SplashActivity extends AppCompatActivity {
                     }
 
                     StringBuilder stringForDB = new StringBuilder();
-//                    for (String s1 : myNewList) {
-//                        stringForDB += s1 + "\t";
-//                    }
 
                     for (int j = 0; j < myNewList.size(); j++) {
                         if (j == (myNewList.size()-1)){
