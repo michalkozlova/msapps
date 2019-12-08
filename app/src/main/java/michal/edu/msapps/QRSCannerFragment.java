@@ -49,7 +49,6 @@ import java.util.Objects;
 public class QRSCannerFragment extends Fragment {
 
     private TextView txtContent;
-    private Button button;
     private SurfaceView surfaceView;
     private CameraSource cameraSource;
     private BarcodeDetector barcodeDetector;
@@ -66,106 +65,78 @@ public class QRSCannerFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_qrscanner, container, false);
 
         txtContent = v.findViewById(R.id.txtContent);
-        button = v.findViewById(R.id.button);
-        ImageView imgview = v.findViewById(R.id.imgview);
         surfaceView = v.findViewById(R.id.surfaceView);
 
-        Bitmap bitmap = BitmapFactory.decodeResource(
-                Objects.requireNonNull(getActivity()).getResources(),
-                R.drawable.msapps
-        );
-        imgview.setImageBitmap(bitmap);
+        barcodeDetector = new BarcodeDetector.Builder(getContext())
+                .setBarcodeFormats(Barcode.QR_CODE)
+                .build();
 
 
-        button.setOnClickListener(new View.OnClickListener() {
-            //TODO: requiresApi
-            @RequiresApi(api = Build.VERSION_CODES.N)
+        cameraSource = new CameraSource.Builder(Objects.requireNonNull(getContext()), barcodeDetector)
+                .setRequestedPreviewSize(640, 480)
+                .build();
+
+
+        surfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
+            @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
-            public void onClick(View v) {
-                BarcodeDetector detector =
-                        new BarcodeDetector.Builder(getContext())
-                                .setBarcodeFormats(Barcode.DATA_MATRIX | Barcode.QR_CODE)
-                                .build();
-                if (!detector.isOperational()) {
-                    txtContent.setText("Could not set up the detector!");
-                    return;
+            public void surfaceCreated(SurfaceHolder holder) {
+                if (Objects.requireNonNull(getActivity()).checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                    getActivity().requestPermissions(
+                            new String[]{"android.permission.CAMERA"},
+                            2
+                    );
                 }
 
-                Frame frame = new Frame.Builder().setBitmap(bitmap).build();
-                SparseArray<Barcode> barcodes = detector.detect(frame);
+                try {
+                    cameraSource.start(holder);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
 
-                Barcode thisCode = barcodes.valueAt(0);
-                txtContent.setText(thisCode.rawValue);
-                Movie newMovie = readJSON(thisCode.rawValue);
+            @Override
+            public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
 
-                System.out.println(newMovie.getImage());
+            }
 
-                checkIfinDB(newMovie, v);
+            @Override
+            public void surfaceDestroyed(SurfaceHolder holder) {
+                cameraSource.stop();
             }
         });
 
 
+        barcodeDetector.setProcessor(new Detector.Processor<Barcode>() {
+            @Override
+            public void release() {
 
-//        barcodeDetector = new BarcodeDetector.Builder(getContext())
-//                .setBarcodeFormats(Barcode.QR_CODE)
-//                .build();
-//
-//
-//        cameraSource = new CameraSource.Builder(Objects.requireNonNull(getContext()), barcodeDetector)
-//                .setRequestedPreviewSize(640, 480)
-//                .build();
+            }
 
+            @Override
+            public void receiveDetections(Detector.Detections<Barcode> detections) {
+                SparseArray<Barcode> qrCodes = detections.getDetectedItems();
 
-//        surfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
-//            @RequiresApi(api = Build.VERSION_CODES.M)
-//            @Override
-//            public void surfaceCreated(SurfaceHolder holder) {
-//                if (Objects.requireNonNull(getActivity()).checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-//                    return;
-//                }
-//
-//                try {
-//                    cameraSource.start(holder);
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//
-//            @Override
-//            public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-//
-//            }
-//
-//            @Override
-//            public void surfaceDestroyed(SurfaceHolder holder) {
-//                cameraSource.stop();
-//            }
-//        });
+                if(qrCodes.size() != 0){
+                    txtContent.post(new Runnable() {
+                        @RequiresApi(api = Build.VERSION_CODES.N)
+                        @Override
+                        public void run() {
+                            Vibrator vibrator = (Vibrator) getContext().getSystemService(Context.VIBRATOR_SERVICE);
+                            vibrator.vibrate(1000);
+
+                            Movie newMoview = readJSON(qrCodes.valueAt(0).displayValue);
 
 
-//        barcodeDetector.setProcessor(new Detector.Processor<Barcode>() {
-//            @Override
-//            public void release() {
-//
-//            }
-//
-//            @Override
-//            public void receiveDetections(Detector.Detections<Barcode> detections) {
-//                SparseArray<Barcode> qrCodes = detections.getDetectedItems();
-//
-//                if(qrCodes.size() != 0){
-//                    txtContent.post(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            Vibrator vibrator = (Vibrator) getContext().getSystemService(Context.VIBRATOR_SERVICE);
-//                            vibrator.vibrate(1000);
-//
-//                            txtContent.setText(qrCodes.valueAt(0).displayValue);
-//                        }
-//                    });
-//                }
-//            }
-//        });
+                            txtContent.setText("Movie found: " + newMoview.getTitle());
+                            barcodeDetector.release();
+
+                            checkIfinDB(newMoview, v);
+                        }
+                    });
+                }
+            }
+        });
 
         return v;
     }
@@ -251,6 +222,19 @@ public class QRSCannerFragment extends Fragment {
             values.put("genre", newMovie.getGenre());
 
             db.insert("Movies", null, values);
+
+            Snackbar.make(view, "Added to the Database", Snackbar.LENGTH_INDEFINITE)
+                    .setAction("OK", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Objects.requireNonNull(getActivity())
+                                    .getSupportFragmentManager()
+                                    .beginTransaction()
+                                    .replace(R.id.container, new MovieListFragment())
+                                    .commit();
+                        }
+                    })
+                    .show();
         }
     }
 
