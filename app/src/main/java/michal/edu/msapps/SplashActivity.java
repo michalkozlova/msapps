@@ -40,8 +40,6 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
-        Toast.makeText(this, "hi", Toast.LENGTH_LONG).show();
-
         MovieOpenHelper dbHelper = new MovieOpenHelper(this);
         System.out.println(dbHelper);
 
@@ -51,7 +49,7 @@ public class SplashActivity extends AppCompatActivity {
         Cursor cursor = db.rawQuery("SELECT * FROM Movies WHERE id = ?", new String[]{"1"});
 
         if (!cursor.moveToFirst()) {
-            Toast.makeText(this, "NO movies", Toast.LENGTH_LONG).show();
+//            Toast.makeText(this, "NO movies", Toast.LENGTH_LONG).show();
             new FetchDataTask().execute(url);
         } else {
             Intent intent = new Intent(this, MovieActivity.class);
